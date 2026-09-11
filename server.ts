@@ -90,7 +90,12 @@ const configuredOrigins = frontendUrlEnv
   ? frontendUrlEnv
       .split(',')
       .map((u) => u.trim().replace(/\/+$/, ''))
-  : ['https://mini-erp-crm-portal-nu.vercel.app'];
+      .filter(Boolean)
+  : [];
+
+const productionAllowedOrigins = [
+  'https://mini-erp-crm-portal-nu.vercel.app',
+];
 
 const defaultAllowedOrigins = [
   'http://localhost:5173',
@@ -135,12 +140,23 @@ app.use(
       }
 
       // ---------------------------------------------------------
-      // 3. Production fallback
+      // 3. Always allow the deployed production frontend
       // ---------------------------------------------------------
       //
-      // If FRONTEND_URL is not configured, allow the deployed
-      // Vercel frontend and the existing default development
-      // origins.
+      // This check is intentionally independent of FRONTEND_URL.
+      // If Render has an old/local FRONTEND_URL configured, the
+      // Vercel frontend must still be able to call the API.
+      //
+      if (productionAllowedOrigins.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+
+      // ---------------------------------------------------------
+      // 4. Production fallback
+      // ---------------------------------------------------------
+      //
+      // Allow other Vercel/Render preview deployments only when
+      // FRONTEND_URL has not been configured explicitly.
       //
       if (
         configuredOrigins.length === 0 &&
@@ -154,7 +170,7 @@ app.use(
       }
 
       // ---------------------------------------------------------
-      // 4. Reject unauthorized origins
+      // 5. Reject unauthorized origins
       // ---------------------------------------------------------
       return callback(null, false);
     },
