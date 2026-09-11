@@ -1,0 +1,6 @@
+{
+  "name": "ERP & CRM Portal",
+  "description": "Neumorphic ERP and CRM portal with role-based JWT auth, customer CRM, inventory tracking, sales challan workflows with stock protection, and PostgreSQL persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
